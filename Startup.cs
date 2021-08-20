@@ -17,18 +17,22 @@ namespace test.net_webapi
         }
 
         public IConfiguration Configuration { get; }
-
         
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
+
             // Database connection
-            services.AddDbContext<DataContext>(opt => opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo {Title = "test.net_webapi", Version = "v1"}));
+            services.AddDbContext<DataContext>(opt =>
+                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            // Add Cors Policy 
+            services.AddCors(opt => opt.AddPolicy("CorsPolicy",
+                policy => policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000")));
+            services.AddSwaggerGen(c =>
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "test.net_webapi", Version = "v1"}));
         }
 
-        
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -40,6 +44,8 @@ namespace test.net_webapi
 
             // app.UseHttpsRedirection();
             app.UseRouting();
+            // Cors Policy Middleware. Need put it always after app.UseRouting()
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

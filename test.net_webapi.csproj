@@ -18,4 +18,12 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ClientApp" />
+      <Folder Include="ClientApp\src\helpers" />
+      <Folder Include="ClientApp\src\interfaces" />
+      <Folder Include="ClientApp\src\pages" />
+      <Folder Include="ClientApp\src\redux" />
+    </ItemGroup>
+
 </Project>

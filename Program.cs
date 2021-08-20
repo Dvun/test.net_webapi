@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using test.net_webapi.Context;
+using test.net_webapi.Data;
 
 namespace test.net_webapi
 {
@@ -23,6 +24,7 @@ namespace test.net_webapi
                 // Try data auto migration if have no database
                 var context = services.GetRequiredService<DataContext>();
                 await context.Database.MigrateAsync();
+                await context.AddAsync(Seed.SeedData(context));
             }
             catch (Exception ex)
             {
