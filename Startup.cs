@@ -1,38 +1,23 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using test.net_webapi.Context;
+using test.net_webapi.Extensions;
 
 namespace test.net_webapi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private readonly IConfiguration _config;
+        public Startup(IConfiguration config) => _config = config;
 
-        public IConfiguration Configuration { get; }
-        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
-            // Database connection
-            services.AddDbContext<DataContext>(opt =>
-                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            // Add Cors Policy 
-            services.AddCors(opt => opt.AddPolicy("CorsPolicy",
-                policy => policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000")));
-            services.AddSwaggerGen(c =>
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "test.net_webapi", Version = "v1"}));
+            services.AddApplicationServices(_config);
         }
-
-
+        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
