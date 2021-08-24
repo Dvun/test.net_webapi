@@ -2,7 +2,8 @@ import React, {SyntheticEvent, useState} from 'react';
 import {IActivity} from '../../../interfaces/interfaces';
 import {Button, Item, ItemContent, ItemDescription, ItemExtra, ItemHeader, ItemMeta, Label} from 'semantic-ui-react';
 import {useStore} from '../../../stores/store';
-import { observer } from 'mobx-react-lite';
+import {observer} from 'mobx-react-lite';
+import {Link} from 'react-router-dom';
 
 interface IActivityItemProps {
   activity: IActivity
@@ -11,12 +12,12 @@ interface IActivityItemProps {
 const ActivityItem: React.FC<IActivityItemProps> = ({activity}) => {
   const {activityStore} = useStore()
   const [target, setTarget] = useState('')
-  
+
   function handleActivityDelete(e: SyntheticEvent<HTMLButtonElement>, id: string) {
     setTarget(e.currentTarget.name)
     activityStore.deleteActivity(activity.id)
   }
-  
+
   return (
     <Item>
       <ItemContent>
@@ -27,7 +28,7 @@ const ActivityItem: React.FC<IActivityItemProps> = ({activity}) => {
           <div>{activity.city}, {activity.venue}</div>
         </ItemDescription>
         <ItemExtra>
-          <Button floated="right" content="View" color="blue" onClick={() => activityStore.selectActivity(activity.id)}/>
+          <Button floated="right" content="View" color="blue" as={Link} to={`/activities/${activity.id}`}/>
           <Button
             name={activity.id}
             loading={activityStore.loading && target === activity.id}

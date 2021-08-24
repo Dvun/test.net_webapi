@@ -22,7 +22,6 @@
 
     <ItemGroup>
       <Folder Include="ClientApp" />
-      <Folder Include="ClientApp\src\pages" />
     </ItemGroup>
 
 </Project>

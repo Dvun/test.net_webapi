@@ -1,27 +1,27 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Grid, GridColumn} from 'semantic-ui-react';
-import {IActivity} from '../../../interfaces/interfaces';
 import ActivityList from './ActivityList';
-import ActivityDetails from '../Details/ActivityDetails';
-import ActivityForm from '../Form/ActivityForm';
-import { observer } from 'mobx-react-lite';
+import {observer} from 'mobx-react-lite';
+import {useStore} from '../../../stores/store';
+import LoadingComponent from '../../LoadingComponent/LoadingComponent';
 
-interface IActivityDashboardProps {
-  activities: IActivity[]
-  selectedActivity: IActivity | undefined
-  editMode: boolean
-}
+const ActivityDashboard: React.FC = () => {
+  const {activityStore} = useStore()
+  const {loadActivities, activityRegistry} = activityStore
 
-const ActivityDashboard: React.FC<IActivityDashboardProps> = ({activities, selectedActivity, editMode}) => {
+  useEffect(() => {
+    if (activityRegistry.size <= 1) loadActivities()
+  }, [activityRegistry.size, loadActivities])
+
+  if (activityStore.loadingInitial) return <LoadingComponent content="Loading App"/>
 
   return (
     <Grid>
       <GridColumn widescreen={10} computer={10} tablet={10} mobile={16}>
-        <ActivityList activities={activities}/>
+        <ActivityList/>
       </GridColumn>
       <GridColumn widescreen={6} computer={6} tablet={6} mobile={16}>
-        {selectedActivity && !editMode && <ActivityDetails/>}
-        {editMode && <ActivityForm/>}
+        <h2>Activity Filter</h2>
       </GridColumn>
     </Grid>
   );

@@ -1,7 +1,6 @@
 import {makeAutoObservable, runInAction} from 'mobx';
 import {IActivity} from '../interfaces/interfaces';
 import callApi from '../helpers/api/callApi';
-import {v4 as uuid} from 'uuid';
 
 export default class ActivityStore {
   activityRegistry = new Map<string, IActivity>()
@@ -13,18 +12,18 @@ export default class ActivityStore {
   constructor() {
     makeAutoObservable(this)
   }
-  
+
   get activitiesByDate() {
     return Array.from(this.activityRegistry.values()).sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
   }
 
   loadActivities = async () => {
+    this.loadingInitial = true
     try {
       const activities = await callApi.Activities.list()
       runInAction(() => {
         activities.forEach(activity => {
-          activity.date = activity.date.split('T')[0]
-          this.activityRegistry.set(activity.id, activity)
+          this.setActivity(activity)
         })
         this.setLoadingInitial(false)
       })
@@ -35,30 +34,42 @@ export default class ActivityStore {
     }
   }
 
+  loadActivity = async (id: string) => {
+    let activity = this.getActivity(id)
+    if (activity) {
+      this.selectedActivity = activity
+      return activity
+    } else {
+      this.loadingInitial = true
+      try {
+        activity = await callApi.Activities.details(id)
+        this.setActivity(activity)
+        runInAction(() => {
+          this.selectedActivity = activity
+        })
+        this.setLoadingInitial(false)
+        return activity
+      } catch (e) {
+        this.setLoadingInitial(false)
+      }
+    }
+  }
+
+  private setActivity = (activity: IActivity) => {
+    activity.date = activity.date.split('T')[0]
+    this.activityRegistry.set(activity.id, activity)
+  }
+
+  private getActivity = (id: string) => {
+    return this.activityRegistry.get(id)
+  }
+
   setLoadingInitial = (state: boolean) => {
     this.loadingInitial = state
   }
 
-  selectActivity = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id)
-  }
-
-  cancelSelectedActivity = () => {
-    this.selectedActivity = undefined
-  }
-
-  openForm = (id?: string) => {
-    id ? this.selectActivity(id) : this.cancelSelectedActivity()
-    this.editMode = true
-  }
-
-  closeForm = () => {
-    this.editMode = false
-  }
-
   createActivity = async (activity: IActivity) => {
     this.loading = true
-    activity.id = uuid()
     try {
       await callApi.Activities.create(activity)
       runInAction(() => {
@@ -91,14 +102,13 @@ export default class ActivityStore {
       })
     }
   }
-  
+
   deleteActivity = async (id: string) => {
     this.loading = true
     try {
       await callApi.Activities.delete(id)
       runInAction(() => {
         this.activityRegistry.delete(id)
-        if (this.selectedActivity?.id === id) this.cancelSelectedActivity()
         this.editMode = false
         this.loading = false
       })

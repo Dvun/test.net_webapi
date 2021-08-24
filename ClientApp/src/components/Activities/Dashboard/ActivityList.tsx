@@ -1,18 +1,15 @@
 import React from 'react';
-import {IActivity} from '../../../interfaces/interfaces';
 import {ItemGroup, Segment} from 'semantic-ui-react';
 import ActivityItem from './ActivityItem';
+import {useStore} from '../../../stores/store';
 
-interface IActivityListProps {
-  activities: IActivity[]
-}
-
-const ActivityList: React.FC<IActivityListProps> = ({activities}) => {
+const ActivityList: React.FC = () => {
+  const {activityStore} = useStore()
 
   return (
     <Segment>
       <ItemGroup divided>
-        {activities.map(activity => (
+        {activityStore.activitiesByDate.map(activity => (
           <ActivityItem key={activity.id} activity={activity}/>
         ))}
       </ItemGroup>
