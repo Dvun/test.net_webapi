@@ -4,6 +4,7 @@ import ActivityList from './ActivityList';
 import {observer} from 'mobx-react-lite';
 import {useStore} from '../../../stores/store';
 import LoadingComponent from '../../LoadingComponent/LoadingComponent';
+import ActivityFilters from './ActivityFilters';
 
 const ActivityDashboard: React.FC = () => {
   const {activityStore} = useStore()
@@ -21,7 +22,7 @@ const ActivityDashboard: React.FC = () => {
         <ActivityList/>
       </GridColumn>
       <GridColumn widescreen={6} computer={6} tablet={6} mobile={16}>
-        <h2>Activity Filter</h2>
+        <ActivityFilters />
       </GridColumn>
     </Grid>
   );
